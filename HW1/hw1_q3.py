@@ -160,8 +160,8 @@ if __name__ == '__main__':
     """This code runs if you execute this script"""
     hw1_q3 = HW1_Q3()
 
-    # # TODO: Uncomment the following code to visualize gradient descent
-    # #       & newton's method for the first loss function
+    # TODO: Uncomment the following code to visualize gradient descent
+    #       & newton's method for the first loss function
     # fig = plt.figure()
     # ax = fig.add_subplot(111)
     # x1 = np.arange(-2, 2, 0.01)
