@@ -79,8 +79,8 @@ class HW1_Q3(object):
         xs = [x]
         for i in range(500000):
             d = -gx(x)           # Direction
-            if np.linalg.norm(d) < 1e-8:
-                return np.array(xs)
+            # if np.linalg.norm(d) < 1e-8:
+            #     return np.array(xs)
             a = self.armijo(x, fx, gx, d)
             if a < 1e-8:
                 return np.array(xs)
@@ -104,8 +104,8 @@ class HW1_Q3(object):
             gradient = gx(x)
             Hessian = hx(x)
 
-            if np.linalg.norm(gradient) < 1e-8:
-                return np.array(xs)
+            # if np.linalg.norm(gradient) < 1e-8:
+            #     return np.array(xs)
 
             d = -np.dot(np.linalg.inv(Hessian), gradient)
             a = self.armijo(x, fx, gx, d)
