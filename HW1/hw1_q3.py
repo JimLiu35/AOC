@@ -82,9 +82,10 @@ class HW1_Q3(object):
             if np.linalg.norm(d) < 1e-8:
                 return np.array(xs)
             a = self.armijo(x, fx, gx, d)
+            if a < 1e-8:
+                return np.array(xs)
             x = x + a * d
             xs.append(x)
-            print(i, end="\r")
 
         return np.array(xs)
 
@@ -108,9 +109,10 @@ class HW1_Q3(object):
 
             d = -np.dot(np.linalg.inv(Hessian), gradient)
             a = self.armijo(x, fx, gx, d)
+            if a < 1e-8:
+                return np.array(xs)
             x = x + a * d
             xs.append(x)
-            print(i, end="\r")
 
         return np.array(xs)
 
@@ -162,24 +164,24 @@ if __name__ == '__main__':
 
     # TODO: Uncomment the following code to visualize gradient descent
     #       & newton's method for the first loss function
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # x1 = np.arange(-2, 2, 0.01)
-    # x2 = np.arange(-2, 2, 0.01)
-    # X1, X2 = np.meshgrid(x1, x2)
-    # Z = np.zeros((X1.shape[0], X1.shape[1]))
-    # for i in range(X1.shape[0]):
-    #     for j in range(X1.shape[1]):
-    #         Z[i, j] = hw1_q3.eval_L1(np.array([X1[i, j], X2[i, j]]))
-    # contour = ax.contour(X1, X2, Z, cmap=cm.viridis)
-    # xsg = hw1_q3.gradient_descent(np.array([0, 0]), hw1_q3.eval_L1,
-    #                               hw1_q3.eval_G1)
-    # xsn = hw1_q3.newton_descent(np.array([0, 0]), hw1_q3.eval_L1,
-    #                             hw1_q3.eval_G1, hw1_q3.eval_H1)
-    # plt.plot(xsg[:, 0], xsg[:, 1], '-o')
-    # plt.plot(xsn[:, 0], xsn[:, 1], '-o')
-    # print("First loss function gradient method steps: ", xsg.shape[0]-1)
-    # print("First loss function newton method steps:   ", xsn.shape[0]-1)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    x1 = np.arange(-2, 2, 0.01)
+    x2 = np.arange(-2, 2, 0.01)
+    X1, X2 = np.meshgrid(x1, x2)
+    Z = np.zeros((X1.shape[0], X1.shape[1]))
+    for i in range(X1.shape[0]):
+        for j in range(X1.shape[1]):
+            Z[i, j] = hw1_q3.eval_L1(np.array([X1[i, j], X2[i, j]]))
+    contour = ax.contour(X1, X2, Z, cmap=cm.viridis)
+    xsg = hw1_q3.gradient_descent(np.array([0, 0]), hw1_q3.eval_L1,
+                                  hw1_q3.eval_G1)
+    xsn = hw1_q3.newton_descent(np.array([0, 0]), hw1_q3.eval_L1,
+                                hw1_q3.eval_G1, hw1_q3.eval_H1)
+    plt.plot(xsg[:, 0], xsg[:, 1], '-o')
+    plt.plot(xsn[:, 0], xsn[:, 1], '-o')
+    print("First loss function gradient method steps: ", xsg.shape[0]-1)
+    print("First loss function newton method steps:   ", xsn.shape[0]-1)
 
     # TODO: Uncomment the following code to visualize gradient descent
     #       & newton's method for the second loss function
