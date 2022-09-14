@@ -44,6 +44,7 @@ class HW1_Q3(object):
     def armijo(self, x, fx, gx, d):
         """Calculate step size using armijo's rule"""
         """Inputs: x (numpy.ndarray, size: 2)
+
                fx (loss function)
                gx (gradient function)
                d (descent direction, numpy.ndarray, size: 2) """
@@ -55,17 +56,16 @@ class HW1_Q3(object):
         beta = 0.25         # Assume the rate of decrease is 0.25
         sigma = 0.01        # Choose the acceptance ratio is 0.01
         m = 0
-        for i in range(100):
+        G = gx(x)
+        f = fx(x)
+        for m in range(100):
             a = beta**m*s
             # Actual descent
-            aDescent = fx(x) - fx(x + a * d)
+            aDescent = f - fx(x + a * d)
             # Predict descent
-            pDescent = -sigma * a * np.dot(gx(x), d)
-            if aDescent >= pDescent:
+            pDescent = -sigma * a * np.dot(G, d)
+            if aDescent > pDescent:
                 return a
-            else:
-                m = m + 1
-        # print(a)
         return a
 
     def gradient_descent(self, x0, fx, gx):
@@ -87,7 +87,7 @@ class HW1_Q3(object):
                 return np.array(xs)
             x = x + a * d
             xs.append(x)
-            print(i, "Current step szie is ", a)
+            # print(i, "Current step szie is ", a)
 
         return np.array(xs)
 
@@ -115,8 +115,8 @@ class HW1_Q3(object):
                 return np.array(xs)
             x = x + a * d
             xs.append(x)
-            print(x)
-            print(i, "Current step szie is ", a)
+            # print(x)
+            # print(i, "Current step szie is ", a)
 
         return np.array(xs)
 
