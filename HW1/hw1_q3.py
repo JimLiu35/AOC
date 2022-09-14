@@ -56,15 +56,16 @@ class HW1_Q3(object):
         sigma = 0.01        # Choose the acceptance ratio is 0.01
         m = 0
         for i in range(100):
+            a = beta**m*s
             # Actual descent
-            aDescent = fx(x) - fx(x + beta**m * s * d)
+            aDescent = fx(x) - fx(x + a * d)
             # Predict descent
-            pDescent = -sigma * beta**m * s * np.vdot(gx(x), d)
+            pDescent = -sigma * a * np.dot(gx(x), d)
             if aDescent >= pDescent:
-                break
+                return a
             else:
                 m = m + 1
-        a = beta ** m * s
+        # print(a)
         return a
 
     def gradient_descent(self, x0, fx, gx):
@@ -86,6 +87,7 @@ class HW1_Q3(object):
                 return np.array(xs)
             x = x + a * d
             xs.append(x)
+            print(i, "Current step szie is ", a)
 
         return np.array(xs)
 
@@ -113,6 +115,8 @@ class HW1_Q3(object):
                 return np.array(xs)
             x = x + a * d
             xs.append(x)
+            print(x)
+            print(i, "Current step szie is ", a)
 
         return np.array(xs)
 
