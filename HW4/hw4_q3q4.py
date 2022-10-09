@@ -48,10 +48,7 @@ class HW4_Q3(object):
         self.B[0] = 0
         self.B[1] = 1
 
-        self.Q[0, 0] = 1
-        self.Q[0, 1] = 0
-        self.Q[1, 0] = 0
-        self.Q[1, 1] = 0.5
+        self.Q = np.diag([1.0, 0.5])
 
         self.R[0] = 0.5
         self.x0[0] = -5
@@ -165,7 +162,7 @@ class HW4_Q4(object):
         self.tf = 5
         self.dt = 0.01
         self.x0 = np.zeros(5)
-        self.Q = np.diag([5, 5, 0.0, 0.1, 0.1])
+        self.Q = np.diag([5, 5, 0.01, 0.1, 0.1])
         self.R = np.diag([0.5, 0.1])
 
     def calc_dx(self, x, u):
@@ -186,7 +183,11 @@ class HW4_Q4(object):
         thetadot = v * np.tan(delta)
         vdot = u1
         deltadot = u2
-        dx = np.array([p1dot, p2dot, thetadot, vdot, deltadot]).reshape([5, 1])
+        dx[0] = p1dot
+        dx[1] = p2dot
+        dx[2] = thetadot
+        dx[3] = vdot
+        dx[4] = deltadot
         return dx
 
     def calc_de(self, x, u):
@@ -198,7 +199,7 @@ class HW4_Q4(object):
 
         de = np.zeros(5)
         dx = self.calc_dx(x, u)
-        dxd = np.array([1, 2, 0, 0, 0])
+        dxd = np.array([1, 2, 0, 0, 0]).reshape([5, ])
         de = dx - dxd
         return de
 
@@ -236,17 +237,16 @@ class HW4_Q4(object):
         us = np.zeros((2, 500))
         xs = np.zeros((5, 501))
         xs[:, 0] = x0
-        xd = np.array([0, 0, np.arctan(2), np.sqrt(5), 0]).reshape([5, 1])
+        xd = np.array([0, 0, np.arctan(2), np.sqrt(5), 0]).reshape([5, ])
         for i in range(500):
             xd[0] = i * dt
             xd[1] = 2 * i * dt
             A, B = self.calc_A_B(xd)
             K, P, _ = lqr(A, B, Q, R)
-            u = -K@(xs[:, [i]] - xd)
+            u = -K@(xs[:, i] - xd)
             dx = self.calc_dx(xs[:, i], u)
-            # print(dx.shape)
-            xs[:, [i+1]] = xs[:, [i]] + dt * dx
-            us[:, [i]] = u
+            xs[:, i+1] = xs[:, i] + dt * dx
+            us[:, i] = u
         return us, xs
 
 
@@ -257,29 +257,29 @@ if __name__ == '__main__':
 
     # # TODO: Uncomment the following lines to generate plots to visualize the result of your functions
 
-    # ts, Ps = hw4_q3.integrate_Pt(hw4_q3.A, hw4_q3.B, hw4_q3.Q, hw4_q3.R,
-    #                              hw4_q3.Pf, hw4_q3.tf, hw4_q3.dt)
-    # fig, axs = plt.subplots(2, 2)
-    # plt.subplots_adjust(wspace=0.3, hspace=0.3)
-    # for i in range(2):
-    #     for j in range(2):
-    #         axs[i, j].plot(ts, Ps[i, j, :])
-    #         axs[i, j].set_xlabel("Time (s)")
-    #         axs[i, j].set_ylabel("P"+str(i)+str(j)+"(t)")
+    ts, Ps = hw4_q3.integrate_Pt(hw4_q3.A, hw4_q3.B, hw4_q3.Q, hw4_q3.R,
+                                 hw4_q3.Pf, hw4_q3.tf, hw4_q3.dt)
+    fig, axs = plt.subplots(2, 2)
+    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    for i in range(2):
+        for j in range(2):
+            axs[i, j].plot(ts, Ps[i, j, :])
+            axs[i, j].set_xlabel("Time (s)")
+            axs[i, j].set_ylabel("P"+str(i)+str(j)+"(t)")
 
-    # us, xs = hw4_q3.solve_ut_xt(hw4_q3.x0, hw4_q3.A, hw4_q3.B, hw4_q3.R,
-    #                             hw4_q3.dt, Ps)
-    # fig, axs = plt.subplots(1, 3)
-    # plt.subplots_adjust(wspace=0.4, hspace=0.3)
-    # axs[0].plot(ts, us[0, :])
-    # axs[0].set_xlabel("Time (s)")
-    # axs[0].set_ylabel("u(t)")
-    # axs[1].plot(ts, xs[0, :-1])
-    # axs[1].set_xlabel("Time (s)")
-    # axs[1].set_ylabel("x0(t)")
-    # axs[2].plot(ts, xs[1, :-1])
-    # axs[2].set_xlabel("Time (s)")
-    # axs[2].set_ylabel("x1(t)")
+    us, xs = hw4_q3.solve_ut_xt(hw4_q3.x0, hw4_q3.A, hw4_q3.B, hw4_q3.R,
+                                hw4_q3.dt, Ps)
+    fig, axs = plt.subplots(1, 3)
+    plt.subplots_adjust(wspace=0.4, hspace=0.3)
+    axs[0].plot(ts, us[0, :])
+    axs[0].set_xlabel("Time (s)")
+    axs[0].set_ylabel("u(t)")
+    axs[1].plot(ts, xs[0, :-1])
+    axs[1].set_xlabel("Time (s)")
+    axs[1].set_ylabel("x0(t)")
+    axs[2].plot(ts, xs[1, :-1])
+    axs[2].set_xlabel("Time (s)")
+    axs[2].set_ylabel("x1(t)")
 
     us, xs = hw4_q4.solve_ut_xt(hw4_q4.x0, hw4_q4.Q, hw4_q4.R, hw4_q4.tf,
                                 hw4_q4.dt)
