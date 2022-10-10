@@ -48,9 +48,10 @@ class HW4_Q3(object):
         self.B[0] = 0
         self.B[1] = 1
 
-        self.Q = np.diag([1.0, 0.5])
+        self.Q = np.diag([2.0, 1])
 
-        self.R[0] = 0.5
+        # self.R[0] = 0.5
+        self.R[0] = 1
         self.x0[0] = -5
         self.x0[1] = 5
 
