@@ -1,8 +1,6 @@
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import solve_ivp
-from control import lqr
 
 ''' Link 1 '''
 S1 = np.array([0, 0]).reshape(2, 1)
@@ -12,8 +10,8 @@ A1 = p0 - S1
 ''' Link 2 '''
 S2 = np.array([0, 0]).reshape(2, 1)
 
-theta1 = np.linspace(-np.pi, np.pi, 300)
-theta2 = np.linspace(-np.pi, np.pi, 300)
+theta1 = np.linspace(0, 2 * np.pi, 300)
+theta2 = np.linspace(0, 2 * np.pi, 300)
 l1 = l2 = 1
 r = 0.25
 p0 = np.array([0.5, 0.5]).reshape(2, 1)

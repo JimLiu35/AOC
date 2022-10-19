@@ -1,11 +1,9 @@
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import solve_ivp
-from control import lqr
 
-theta1 = np.linspace(-np.pi, np.pi, 200)
-theta2 = np.linspace(-np.pi, np.pi, 200)
+theta1 = np.linspace(0, 2*np.pi, 200)
+theta2 = np.linspace(0, 2*np.pi, 200)
 l1 = l2 = 1
 r = 0.25
 p0 = np.array([0.5, 0.5]).reshape(2, 1)
@@ -20,7 +18,6 @@ for i in theta1:
 cspace = np.array([cspace])
 k = cspace.shape[1]
 cspace_plot = cspace.reshape(k, 2)
-print(cspace_plot.shape)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 plt.scatter(cspace_plot[:, 0], cspace_plot[:, 1], c='g')
