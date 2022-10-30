@@ -13,7 +13,7 @@ class HW6_Q4(object):
         self.A = np.zeros((2, 2))
         self.B = np.zeros((2, 1))
         self.w = np.zeros((2, 1))
-        self.Pf = np.array((2, 2))
+        self.Pf = np.array([[1, 0], [0, 1]])
         self.Q = np.zeros((2, 2))
         self.R = np.array((1, 1))
         self.N = 100
@@ -24,10 +24,7 @@ class HW6_Q4(object):
 
         self.B[1] = self.dt
         self.w[1] = 0.1 * self.dt
-        self.R = 0.04
-        # pN and vN are all set to zeros
-        self.Pf[0] = 1
-        self.Pf[1] = 1
+        self.R = np.array([0.04]).reshape((1, 1))
 
     def calc_Ps_bs(self):
         """Calculate Ps and bs"""
@@ -44,8 +41,8 @@ class HW6_Q4(object):
             else:
                 Ps_pre = Ps[:, :, idx+1]
                 bs_pre = bs[:, :, idx+1]
-                M_temp = np.linalg.inv(self.R + self.B.T
-                                       @ Ps_pre @ self.B)
+                M_temp = 1 / ((self.R + self.B.T @ Ps_pre @
+                               self.B))
                 Ps[:, :, idx] = self.Q + self.A.T @ \
                     (Ps_pre - Ps_pre @ self.B @ M_temp @ self.B.T @ Ps_pre)\
                     @ self.A
@@ -79,7 +76,8 @@ class HW6_Q4(object):
 
         # 4c) TODO: Implement me
         x_ = np.zeros(2)
-        x_ = (self.A @ x.reshape((2, 1)) + self.B @ u + self.w)
+        x_ = (self.A @ x.reshape((2, 1)) + np.dot(self.B, u) +
+              self.w).reshape((2, ))
         return x_
 
     def calc_xs_us(self, x, Ps, bs):
@@ -98,7 +96,7 @@ class HW6_Q4(object):
         for i in range(1, self.N+1):
             u_temp = self.control(xs[:, i-1], Ps[:, :, i], bs[:, :, i])
             us[i-1] = u_temp
-            xs[:, [i]] = self.dynamics(xs[:, i-1], u_temp)
+            xs[:, i] = self.dynamics(xs[:, i-1], u_temp)
         return xs, us
 
 
