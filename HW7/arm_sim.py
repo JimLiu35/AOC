@@ -29,8 +29,8 @@ class Arm:
         # cost function parameters
         # self.Q = np.diag([0, 0, 0, 0])
         self.Q = np.diag([1, 1, 1, 1])
-        self.R = np.diag([0.1, 0.5])
-        self.Qf = np.diag([1, 1, 1, 1])
+        self.R = np.diag([0.01, 0.01])
+        self.Qf = np.diag([5, 5, 1, 1])
         self.Qs = np.sqrt(self.Q)
         self.Rs = np.sqrt(self.R)
         self.Qfs = np.sqrt(self.Qf)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     arm = Arm()
 
     # initial state
-    x0 = np.zeros(4)
+    # x0 = np.zeros(4)
 
     # controls
     us = np.zeros((2, arm.N))
