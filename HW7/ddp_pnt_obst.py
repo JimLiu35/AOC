@@ -11,8 +11,8 @@ class Problem:
 
         # time-step and # of segments
         self.tf = 10
-        self.h = 1
-        self.N = 10
+        self.N = 100
+        self.h = self.tf / self.N
 
         # system mass
         self.m = 2
@@ -26,7 +26,11 @@ class Problem:
 
         self.os_p = [[-2.5, -2.5]]
         self.os_r = [1]
-        self.ko = 5
+        # upper constraint for u
+        self.u_con = np.array([0.15, 0.15])
+        # lower constraint for u
+        self.l_con = np.array([-0.15, 0.15])
+        self.ko = 10
 
         # initial state
         self.x0 = np.array([-5, -5, 0.3, 0])
@@ -69,11 +73,37 @@ class Problem:
                 c = self.os_r[i] - np.linalg.norm(g)
                 if c < 0:
                     continue
-
                 L = L + self.ko/2.0*c**2
                 v = g/np.linalg.norm(g)
                 Lx[:2] = Lx[:2] - self.ko*c*v
                 Lxx[:2, :2] = Lxx[:2, :2] + self.ko*np.transpose(v)@v
+
+        if hasattr(self, 'u_con'):
+            if k < self.N:
+                c = np.zeros_like(g)
+                for i in range(self.u_con.shape[0]):
+                    c_temp = u[i] - self.u_con[i]
+                    if c_temp < 0:
+                        c[i] = 0
+                    else:
+                        c[i] = c_temp
+                L = L + self.ko/2.0*c[0]**2 + self.ko/2.0*c[1]**2
+                Lu = Lu + self.ko*c
+                Luu = Luu + self.ko * np.eye(2)
+
+        if hasattr(self, 'l_con'):
+            if k < self.N:
+                c = np.zeros_like(g)
+                # print(self.u_con.shape[0])
+                for i in range(self.l_con.shape[0]):
+                    c_temp = - u[i] + self.l_con[i]
+                    if c_temp < 0:
+                        c[i] = 0
+                    else:
+                        c[i] = c_temp
+                L = L + self.ko/2.0*c[0]**2 + self.ko/2.0*c[1]**2
+                Lu = Lu - self.ko*c
+                Luu = Luu + self.ko * np.eye(2)
 
         return L, Lx, Lxx, Lu, Luu
 
