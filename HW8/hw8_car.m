@@ -72,4 +72,7 @@ END_ACADO;           % Always end with "END_ACADO".
 % Run the test
 out = hw8_car_RUN();
 
+% Save output data
+save('Q1out.mat', 'out')
+
 draw;
