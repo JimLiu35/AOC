@@ -6,50 +6,50 @@ import matplotlib.pyplot as plt
 
 class Problem:
 
-  def __init__(self):
+    def __init__(self):
 
-    # timing
-    self.dt = 1   # time-step
-    self.N = 30    # total time-steps
-    self.T = self.N * self.dt   # final time
+        # timing
+        self.dt = 1   # time-step
+        self.N = 30    # total time-steps
+        self.T = self.N * self.dt   # final time
 
-    # noise terms
-    self.qu = (3e-9)**2  # external disturbance variance thetadot
-    self.qv = (3e-6)**2  # external disturbance variance bias
-    self.qn = (1.5e-5)**2  # measurement noise variance
+        # noise terms
+        self.qu = (3e-9)**2  # external disturbance variance thetadot
+        self.qv = (3e-6)**2  # external disturbance variance bias
+        self.qn = (1.5e-5)**2  # measurement noise variance
 
-    # PHI matrix
-    self.Phi = np.array([[1, -self.dt], [0, 1]])
+        # PHI matrix
+        self.Phi = np.array([[1, -self.dt], [0, 1]])
 
-    # G matrix
-    self.G = np.array([[self.dt], [0]])
+        # G matrix
+        self.G = np.array([[self.dt], [0]])
 
-    # Q matrix
-    self.Q = np.array([[self.qv * self.dt + self.qu * (self.dt**3 / 3.0),
-                        -self.qu * (self.dt**2 / 2.0)],
-                       [-self.qu * (self.dt**2 / 2.0), self.qu * self.dt]])
+        # Q matrix
+        self.Q = np.array([[self.qv * self.dt + self.qu * (self.dt**3 / 3.0),
+                            -self.qu * (self.dt**2 / 2.0)],
+                           [-self.qu * (self.dt**2 / 2.0), self.qu * self.dt]])
 
-    # R matrix
-    self.R = self.qn
+        # R matrix
+        self.R = self.qn
 
-    # H matrix
-    self.H = np.array([[1, 0]])
+        # H matrix
+        self.H = np.array([[1, 0]])
 
 
 def kf_predict(x, P, u, prob):
 
-  x = prob.Phi @ x + prob.G @ u
-  P = prob.Phi @ P @ np.transpose(prob.Phi) + prob.Q
-  return x, P
+    x = prob.Phi @ x + prob.G @ u
+    P = prob.Phi @ P @ np.transpose(prob.Phi) + prob.Q
+    return x, P
 
 
 def kf_correct(x, P, z, prob):
 
-  K = P @ np.transpose(prob.H) @ np.linalg.inv(prob.H @ P @ np.transpose(prob.H) +
-                                               prob.R)
-  P = (np.eye(np.size(x)) - K @ prob.H) @ P
-  x = x + K @ (z - prob.H @ x)
-  return x, P
+    K = P @ np.transpose(prob.H) @ np.linalg.inv(prob.H @ P @ np.transpose(prob.H) +
+                                                 prob.R)
+    P = (np.eye(np.size(x)) - K @ prob.H) @ P
+    x = x + K @ (z - prob.H @ x)
+    return x, P
 
 
 prob = Problem()
@@ -75,24 +75,24 @@ nm[0] = np.linalg.norm(P)
 
 for k in range(prob.N):
 
-  xts[:, k + 1] = xts[:, k] + np.concatenate((np.array([thetadot * prob.dt]), 
-                                np.sqrt(prob.qu) * np.random.randn(1)))
+    xts[:, k + 1] = xts[:, k] + np.concatenate((np.array([thetadot * prob.dt]),
+                                                np.sqrt(prob.qu) * np.random.randn(1)))
 
-  # generate u based on true state
-  u=thetadot + xts[1, k + 1] + np.sqrt(prob.qv) * np.random.randn(1)
+    # generate u based on true state
+    u = thetadot + xts[1, k + 1] + np.sqrt(prob.qv) * np.random.randn(1)
 
-  x, P=kf_predict(x, P, u, prob)  # prediction
+    x, P = kf_predict(x, P, u, prob)  # prediction
 
-  # generate random measurement
-  z=xts[0, k + 1] + np.sqrt(prob.qn) * np.random.randn(1)
+    # generate random measurement
+    z = xts[0, k + 1] + np.sqrt(prob.qn) * np.random.randn(1)
 
-  x, P=kf_correct(x, P, z, prob)  # correction
+    x, P = kf_correct(x, P, z, prob)  # correction
 
-  # record result
-  xs[:, k + 1]=x
-  Ps[:, :, k + 1]=P
-  zs[:, k]=z + 1
-  nm[k + 1]=np.linalg.norm(P)
+    # record result
+    xs[:, k + 1] = x
+    Ps[:, :, k + 1] = P
+    zs[:, k] = z + 1
+    nm[k + 1] = np.linalg.norm(P)
 
 plt.figure()
 plt.plot(xts[0, :], 'x--', linewidth=2)
