@@ -62,7 +62,7 @@ thetadot = 0.02  # given trajectory for true state theta
 xts = np.zeros((2, prob.N + 1))     # true states
 xs = np.zeros((2, prob.N + 1))      # estimated states
 Ps = np.zeros((2, 2, prob.N + 1))   # estimated covariances
-nm = np.zeros((prob.N + 1, 1))
+nm = np.zeros((prob.N + 1, 1))      # Norm of covariance
 
 zs = np.zeros((1, prob.N))        # estimated state
 
