@@ -27,10 +27,10 @@ class Problem:
         self.bearing_only = 1
 
         # single beacon at (-2,2) : system is unobservable
-        # self.pbs = np.arrasy([[-2], [2]])    # beacon positions
+        self.pbs = np.array([[0], [2]])    # beacon positions
 
         # two beacons at (-2,2) and (2,2) : system is observable (two or more)
-        self.pbs = np.array([[-2, 2], [2, 2]])    # beacon positions
+        # self.pbs = np.array([[-2, 2], [2, 2]])    # beacon positions
 
         self.nb = self.pbs.shape[1]  # number of beacons
 
@@ -38,12 +38,12 @@ class Problem:
             self.h = self.b_h         # bearing sensing
             self.r = self.nb          # measurement dimension
             self.R = .4 * np.diag(np.ones(self.nb) * 0.1)
-            # self.R = .01 * np.diag([0.5, 1.0])
+            # self.R = .01 * np.diag(np.ones(self.nb) * 0.5)
         else:
             self.h = self.br_h        # bearing-reange sensing
             self.r = 2 * self.nb      # measurement dimension
-            self.R = .4 * np.diag(np.tile(np.array([.1, .01]), self.nb))
-            # self.R = .01 * np.diag([0.5])
+            # self.R = .4 * np.diag(np.tile(np.array([.1, .01]), self.nb))
+            self.R = .01 * np.diag(np.tile(np.array([0.5, 1.0]), self.nb))
 
         self.n = 4            # state dimension
         self.f = self.uni_f   # mobile-robot dynamics
@@ -51,14 +51,14 @@ class Problem:
         # timing
         dt = .1
         # N = 2580
-        self.N = 100
+        self.N = 50
         self.T = dt * self.N
         self.dt = dt
 
         # noise models
         # self.Q = .3 * dt * np.diag([.1, .1, .01])
         self.Q = .1 * dt * dt * np.diag([.1, .1, .1, .001])
-        self.R = .01 * np.diag([0.5, 1.0])
+        # self.R = .01 * np.diag([0.5, 1.0])
 
     def b_h(self, x):
 

@@ -35,7 +35,7 @@ class Problem:
 
         # timing
         dt = .1
-        self.N = 100
+        self.N = 50
         self.T = dt * self.N
         self.dt = dt
 

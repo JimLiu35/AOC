@@ -79,7 +79,6 @@ for k in range(prob.N):
     xts[:, k + 1] = xts[:, k] + np.concatenate((np.array([thetadot * prob.dt]),
                                                 np.sqrt(prob.qu) * np.random.randn(1)))
 
-
     # generate u based on true state
     u = thetadot + xts[1, k + 1] + np.sqrt(prob.qv) * np.random.randn(1)
 
@@ -93,7 +92,7 @@ for k in range(prob.N):
     # record result
     xs[:, k + 1] = x
     Ps[:, :, k + 1] = P
-    zs[:, k] = z + 1
+    zs[:, k] = z
     nm[k + 1] = np.linalg.norm(P)
 
 plt.figure()

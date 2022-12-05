@@ -8,15 +8,15 @@ from matplotlib import cm
 
 def shape_basis(p, q):
 
-  f = np.transpose(np.concatenate(
-    (np.array([p**2, q**2, p * q, p, q]), np.ones((1, np.size(p))))))
+    f = np.transpose(np.concatenate(
+        (np.array([p**2, q**2, p * q, p, q]), np.ones((1, np.size(p))))))
 
-  return f
+    return f
 
 
 def shape(p, q, x):
-  z = shape_basis(p, q) @ x
-  return z
+    z = shape_basis(p, q) @ x
+    return z
 
 
 # workspace is the square [s, s]x[-s, s]
@@ -32,8 +32,8 @@ s2 = np.arange(-s, s, 0.1)
 S1, S2 = np.meshgrid(s1, s2)
 gt = np.zeros((S1.shape[0], S1.shape[1]))
 for i in range(S1.shape[0]):
-  for j in range(S1.shape[1]):
-    gt[i, j] = shape(np.array([S1[i, j]]), np.array([S2[i, j]]), x_true)
+    for j in range(S1.shape[1]):
+        gt[i, j] = shape(np.array([S1[i, j]]), np.array([S2[i, j]]), x_true)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 surface = ax.plot_surface(S1, S2, gt, cmap=cm.jet, linewidth=0,
@@ -59,8 +59,8 @@ x = np.linalg.inv(np.transpose(H) @ np.linalg.inv(R) @
 # plot estimated
 ge = np.zeros((S1.shape[0], S1.shape[1]))
 for i in range(S1.shape[0]):
-  for j in range(S1.shape[1]):
-    ge[i, j] = shape(np.array([S1[i, j]]), np.array([S2[i, j]]), x)
+    for j in range(S1.shape[1]):
+        ge[i, j] = shape(np.array([S1[i, j]]), np.array([S2[i, j]]), x)
 surface = ax.plot_surface(S1, S2, ge, cmap=cm.jet, linewidth=0,
                           antialiased=False, alpha=0.8)
 
