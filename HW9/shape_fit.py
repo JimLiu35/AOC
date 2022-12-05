@@ -67,7 +67,8 @@ for i in range(S1.shape[0]):
         ge[i, j] = shape(np.array([S1[i, j]]), np.array([S2[i, j]]), x)
 surface = ax.plot_surface(S1, S2, ge, cmap=cm.jet, linewidth=0,
                           antialiased=False, alpha=0.8)
-ax.set_title("k = 8 with 1 iterations")
+ax.set_title("k = 2 with 4 iterations")
+# ax.set_title("Batch Estimation")
 
 
 # print(xs.shape)

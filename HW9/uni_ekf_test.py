@@ -11,7 +11,7 @@ def fangle(a):
     # make sure angle is between -pi and pi
     a = np.mod(a, 2 * np.pi)
     if a < -np.pi:
-        a = a + a * np.pi
+        a = a + 2 * np.pi
     else:
         if a > np.pi:
             a = a - 2 * np.pi
@@ -24,7 +24,7 @@ class Problem:
 
         np.random.seed(10212)
 
-        self.bearing_only = 1
+        self.bearing_only = 0
 
         # single beacon at (-2,2) : system is unobservable
         self.pbs = np.array([[0], [2]])    # beacon positions
@@ -37,8 +37,8 @@ class Problem:
         if self.bearing_only:
             self.h = self.b_h         # bearing sensing
             self.r = self.nb          # measurement dimension
-            self.R = .4 * np.diag(np.ones(self.nb) * 0.1)
-            # self.R = .01 * np.diag(np.ones(self.nb) * 0.5)
+            # self.R = .4 * np.diag(np.ones(self.nb) * 0.1)
+            self.R = .01 * np.diag(np.ones(self.nb) * 0.5)
         else:
             self.h = self.br_h        # bearing-reange sensing
             self.r = 2 * self.nb      # measurement dimension

@@ -22,8 +22,7 @@ class Problem:
         self.Phi = np.array([[1, -self.dt], [0, 1]])
 
         # G matrix
-        c = 0
-        self.G = np.array([[self.dt], [c]])
+        self.G = np.array([[self.dt], [0]])
 
         # Q matrix
         self.Q = np.array([[self.qv * self.dt + self.qu * (self.dt**3 / 3.0),

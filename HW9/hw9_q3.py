@@ -13,7 +13,7 @@ def fangle(a):
     # make sure angle is between -pi and pi
     a = np.mod(a, 2 * np.pi)
     if a < -np.pi:
-        a = a + a * np.pi
+        a = a + 2 * np.pi
     else:
         if a > np.pi:
             a = a - 2 * np.pi
