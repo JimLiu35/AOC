@@ -234,10 +234,12 @@ ax2[1].plot(ts, np.reshape(np.sqrt(Ps[0, 0, :]), Ps.shape[2]), label="sigma_x")
 ax2[1].plot(ts, np.reshape(np.sqrt(Ps[1, 1, :]), Ps.shape[2]), label="sigma_y")
 ax2[1].plot(ts, np.reshape(np.sqrt(Ps[2, 2, :]),
             Ps.shape[2]), label="sigma_theta")
+ax2[1].plot(ts, np.reshape(np.sqrt(Ps[3, 3, :]),
+            Ps.shape[2]), label="sigma_r")
 
 ax2[1].set_xlabel('t')
 ax2[1].set_ylabel('meters or radians')
-handles, labels = ax2[0].get_legend_handles_labels()
+handles, labels = ax2[1].get_legend_handles_labels()
 labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
 ax2[1].legend(handles, labels)
 

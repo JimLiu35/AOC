@@ -23,8 +23,7 @@ def shape(p, q, x):
 s = 10
 
 # true shape parameter (i.e. a symmetric cup)
-x_true = np.array([1.2, 1.3, 1, 1, 1, 1])
-P = np.diag([16, 16, 16, 16, 16, 16])      # initial prior
+x_true = np.array([1, 1, 0, 0, 0, 0])
 
 # plot true
 test = shape(np.array([-s]), np.array([s]), x_true)
@@ -44,21 +43,19 @@ surface = ax.plot_surface(S1, S2, gt, cmap=cm.jet, linewidth=0,
 std = 20
 
 # number of measurements
-k = 2
-x = x_true
-for i in range(int(8/k)):
-    # generate random measurements
-    p = 4 * s * (np.random.rand(k) - 0.5)
-    q = 4 * s * (np.random.rand(k) - 0.5)
-    z = shape(p, q, x_true) + np.random.randn(k) * std
+k = 8
 
-    # estimate optimal parameters x
-    R = np.diag(np.ones(k) * std**2)
-    H = shape_basis(p, q)
-    P = np.linalg.inv(np.linalg.inv(P) + np.transpose(H) @ np.linalg.inv(R)
-                      @ H)
-    K = P @ np.transpose(H) @ np.linalg.inv(R)
-    x = x + K @ (z - H @ x)
+# generate random measurements
+p = 4 * s * (np.random.rand(k) - 0.5)
+q = 4 * s * (np.random.rand(k) - 0.5)
+z = shape(p, q, x_true) + np.random.randn(k) * std
+
+# estimate optimal parameters x
+R = np.diag(np.ones(k) * std**2)
+H = shape_basis(p, q)
+x = np.linalg.inv(np.transpose(H) @ np.linalg.inv(R) @
+                  H) @ np.transpose(H) @ np.linalg.inv(R) @ z
+print(x.shape)
 
 # plot estimated
 ge = np.zeros((S1.shape[0], S1.shape[1]))
@@ -69,5 +66,4 @@ surface = ax.plot_surface(S1, S2, ge, cmap=cm.jet, linewidth=0,
                           antialiased=False, alpha=0.8)
 
 
-# print(xs.shape)
 plt.show()
