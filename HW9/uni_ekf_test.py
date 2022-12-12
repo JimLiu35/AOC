@@ -24,7 +24,7 @@ class Problem:
 
         np.random.seed(10212)
 
-        self.bearing_only = 0
+        self.bearing_only = 1
 
         # single beacon at (-2,2) : system is unobservable
         self.pbs = np.array([[0], [2]])    # beacon positions
