@@ -1,0 +1,197 @@
+function f = Final_stage_one()
+
+% time horizon and segments
+tf = 20;
+S.N = 32;
+S.h = tf/S.N;
+
+% cost function parameters
+S.Q = .0*diag([0, 0, 0]);
+% S.R = diag([.1, .1, 1.5]);
+S.R = diag([10, 10, 10]);
+S.Qf = diag([100, 100, 25]);
+
+S.f = @eyeNeedle_f;
+S.L = @eyeNeedle_L;
+S.Lf = @eyeNeedle_Lf;
+S.mu = 0;
+S.length = 30;
+
+% initial state
+x0x = 0;
+x0y = -5;
+
+
+% S.os(1).p = [-2.5;-2.5];
+% S.os(1).r = 1;
+S.ko = 2;
+S.rcm = [10; 0];
+x0 = [x0x; x0y; atan2(S.rcm(2) - (x0y), S.rcm(1) - x0x)];
+xfx = 0;
+xfy = 5;
+S.xf = [xfx; xfy; atan2(S.rcm(2) - (xfy), S.rcm(1) - xfx)];
+fprintf("Initial theta is %f\n", x0(3))
+fprintf("Final theta is %f\n", S.xf(3))
+
+% initial control sequence
+us = [repmat([.1;0.1; 0.05], 1, S.N/2), repmat(-[.1;0.1;0.05], 1, S.N/2)]/3;
+%us = [repmat([.1;0], 1, N/2), repmat(-[.1;0], 1, N/2)]/5;
+us = zeros(3,S.N);
+
+xs = ddp_traj(x0, us, S);
+
+Jmin = ddp_cost(xs, us,  S)
+
+subplot(1,2,1)
+
+plot(xs(1,:), xs(2,:), '-b')
+hold on
+
+if isfield(S, 'os')
+  da = .1;
+  a = -da:da:2*pi;
+  for i=1:length(S.os)
+    % draw obstacle
+    plot(S.os(i).p(1) + cos(a)*S.os(i).r,  S.os(i).p(2) + sin(a)*S.os(i).r, ...
+         '-r','LineWidth',2);
+  end
+  axis equal
+end
+
+
+
+S.a = 1;
+
+for i=1:50
+  [dus, V, Vn, dV, a] = ddp(x0, us, S);
+
+  % update controls
+  us = us + dus;
+  
+  S.a = a;   % reuse step-size for efficiency
+  
+  % update trajectory
+  xs = ddp_traj(x0, us, S);
+
+  plot(xs(1,:), xs(2,:), '-b');
+end
+
+plot(xs(1,:), xs(2,:), '-g', 'LineWidth', 3);
+
+J = ddp_cost(xs, us, S)
+
+xlabel('x')
+ylabel('y')
+
+subplot(1,2,2)
+
+plot(0:S.h:tf-S.h, us(1,:),0:S.h:tf-S.h, us(2,:), 0:S.h:tf-S.h, us(3,:));
+xlabel('sec.')
+legend('u_1','u_2','u_3')
+
+figure
+subplot(3,1,1)
+T = linspace(0, 20, S.N+1);
+plot(T, xs(1,:))
+legend("Needle tip x")
+subplot(3,1,2)
+plot(T, xs(2,:))
+legend("Needle tip y")
+subplot(3,1,3)
+plot(T, xs(3,:))
+legend("Theta")
+
+
+
+function [L, Lx, Lxx, Lu, Luu] = eyeNeedle_L(k, x, u, S)
+% car cost (just standard quadratic cost)
+
+if (k == S.N+1)
+  L = (x - S.xf)'*S.Qf*(x - S.xf)/2;
+  Lx = S.Qf*(x - S.xf);
+  Lxx = S.Qf;
+  Lu = [];
+  Luu = [];
+else
+  L = S.h/2*(x'*S.Q*x + u'*S.R*u);
+  Lx = S.h*S.Q*x;
+  Lxx = S.h*S.Q;
+  Lu = S.h*S.R*u;
+  Luu = S.h*S.R;
+end
+
+% quadratic penalty term
+if isfield(S, 'rcm')
+    epsilon = 1e-5;         % bound
+    cs = cos(x(3));
+    ss = sin(x(3));
+    de1 = ((S.rcm(1) - x(1))^2 + (S.rcm(2) - x(2)))^0.5;
+    de2 = ((S.rcm(1) - x(1))^2 + (S.rcm(2) - x(2)))^1.5;
+    c = 1 - (cs * (S.rcm(1) - x(1)) + ss * (S.rcm(2) - x(2)))/(de1);
+    P_rcme = rcmEstimation(x, S);
+    fprintf("Estimated RCM Coordinates are (%f, %f)\n", P_rcme(1), P_rcme(2))
+    fprintf("Given RCM Coordinates are (%f, %f)\n", S.rcm(1), S.rcm(2))
+    e_rcm = 
+    fprintf("Diff between Estimated RCM and Given RCM is (%f, %f)", )
+    if c > epsilon
+%         fprintf("Working!!!\n")
+        L = L + S.ko/2*c^2;
+        Lx_temp = - [-cs/de1 + cs * (S.rcm(1) - x(1))^2/de2;
+                     -ss/de1 + ss * (S.rcm(2) - x(2))^2/de2;
+                     (-ss * (S.rcm(1) - x(1)) + cs * (S.rcm(2) - x(2)))/de1];
+        Lx = Lx + S.ko * c * Lx_temp;
+        Lxx = Lxx + S.ko * (Lx_temp' * Lx_temp);
+    end
+        
+%   for i=1:length(S.os)
+%     g = x(1:2) - S.os(i).p;
+%     c = S.os(i).r - norm(g);
+%     if c < 0
+%       continue
+%     end
+%     
+%     L = L + S.ko/2*c^2;
+%     v = g/norm(g);
+%     Lx(1:2) = Lx(1:2) - S.ko*c*v;
+%     Lxx(1:2,1:2) = Lxx(1:2,1:2) + S.ko*v*v';  % Gauss-Newton appox
+%   end
+end
+
+
+function [x, A, B] = eyeNeedle_f(k, x, u, S)
+% car dynamics and jacobians
+
+h = S.h;
+
+% A = zeros(3,3);
+A = eye(3);
+
+B = S.h * eye(3);
+
+x = [x(1) + h * u(1);
+     x(2) + h * u(2);
+     x(3) + h * u(3)];
+
+% x = [x(1) + h*c*v;
+%      x(2) + h*s*v;
+%      x(3) + h*w;
+%      v + h*u(1);
+%      w + h*u(2)];
+
+function P_rcme = rcmEstimation(x, S)
+% Estimate RCM point based on current state and needle length
+r = 10;         % Eye radius
+slope = tan(x(3));
+intercpt = x(2) - slope * x(1);
+% fprintf("Intercept is %f\n",intercpt)
+root = roots([1 + slope^2, 2 * slope * intercpt, intercpt^2 - r^2]);
+x_temp1 = root(1);
+x_temp2 = root(2);
+% fprintf("x_temp1 is %f\n",x_temp2)
+if S.rcm(1) >= 0
+    x_out = max(x_temp1, x_temp2);
+else
+    x_out = min(x_temp1, x_temp2);
+end
+y_out = slope * x_out + intercpt;
+P_rcme = [x_out, y_out];
